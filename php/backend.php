@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__. './DatabaseController.php';
+require_once __DIR__ . './DatabaseController.php';
 
 /**
  * @date 05.05.20
@@ -51,7 +51,7 @@ function GetSalt(string $email): ?string
 /**
  * @author Hoarau Nicolas
  *
- * @date 22.03.2020
+ * @date 05.05.2020
  * @brief Fonction qui log l'utilisateur
  * @param array les infos de login de l'utilisateur
  *
@@ -100,7 +100,78 @@ function Login(array $args)
 
     $result = $requestLogin->fetch(PDO::FETCH_ASSOC);
 
-    return $result !== false > 0 ?  $result: false;
+    return $result !== false > 0 ?  $result : false;
+  } catch (PDOException $e) {
+    return null;
+  }
+}
+
+/**
+ * @author Hoatau Nicolas
+ * 
+ * @date 05.05.2020
+ * @brief Fonction qui fait le register en sql
+ * @param array $args
+ * 
+ * @return boolean
+ * @version 1.0.0
+ */
+function Register(string $lastname, string $firstname, string $phoneNumber, string $email, string $password): bool
+{
+  $query = <<<EX
+    INSERT INTO users (lastname, firstname, phoneNumber, email, password, salt, idRoles)
+    VALUES (:lastname, :firstname, :phoneNumber, :email, :password, :salt, 1);
+    EX;
+
+  $salt = hash('sha256', microtime());
+  $userPassword = hash('sha256', $password . $salt);
+
+  try {
+    DatabaseController::beginTransaction();
+
+    $requestRegister = DatabaseController::prepare($query);
+    $requestRegister->bindParam(':lastname', $lastname, PDO::PARAM_STR);
+    $requestRegister->bindParam(':firstname', $firstname, PDO::PARAM_STR);
+    $requestRegister->bindParam(':phoneNumber', $phoneNumber, PDO::PARAM_STR, 12);
+    $requestRegister->bindParam(':email', $email, PDO::PARAM_STR);
+    $requestRegister->bindParam(':password', $userPassword, PDO::PARAM_STR);
+    $requestRegister->bindParam(':salt', $salt);
+
+    $requestRegister->execute();
+
+    DatabaseController::commit();
+    return true;
+  } catch (PDOException $e) {
+    DatabaseController::rollBack();
+    return false;
+  }
+}
+
+/**
+ * @author Hoarau Nicolas
+ *
+ * @date 05.05.2020
+ * @brief Fonction qui vérifie si le paramètre donnée(email, nickname) est déjà utilisé ou non
+ * @param array $args
+ * 
+ * @return boolean|null
+ * @version 1.0.0
+ */
+function IsTaken(string $email): ?bool
+{
+  $query = <<<EX
+    SELECT email
+    FROM users
+    WHERE email = :email
+    EX;
+
+  try {
+    $requestIsUsed = DatabaseController::prepare($query);
+    $requestIsUsed->bindParam(':email', $email, PDO::PARAM_STR);
+    $requestIsUsed->execute();
+    $result = $requestIsUsed->fetch(PDO::FETCH_ASSOC);
+
+    return $result !== false ? true : false;
   } catch (PDOException $e) {
     return null;
   }
