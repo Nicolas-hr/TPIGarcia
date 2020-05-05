@@ -18,7 +18,7 @@
       </li>
       <?php else : ?>
       <li class="nav-item">
-        <a class="nav-link" href="./logout.php">Déconnexion</a>
+        <a class="nav-link" href="./php/logout.php">Déconnexion</a>
       </li>
         <?php endif; ?>
     </ul>
