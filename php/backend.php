@@ -55,7 +55,7 @@ function GetSalt(string $email): ?string
  * @brief Fonction qui log l'utilisateur
  * @param array les infos de login de l'utilisateur
  *
- * @return User|false
+ * @return array|false
  * @version 1.0.0
  */
 function Login(array $args)
@@ -100,9 +100,53 @@ function Login(array $args)
 
     $result = $requestLogin->fetch(PDO::FETCH_ASSOC);
 
-    return $result !== false > 0 ?  $result : false;
+    if ( $result !== false > 0) {
+      if (LoggedDate($result['idUsers'])) {
+        return $result;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+
   } catch (PDOException $e) {
     return null;
+  }
+}
+
+/**
+ * @author Hoarau Nicolas
+ *
+ * @date 05.05.2020
+ * @brief Fonction qui ajoute la derniere date de login
+ * 
+ * @param integer $idUser
+ * @return boolean
+ * @version 1.0.0
+ */
+function LoggedDate(int $idUser) : bool
+{
+  $query = <<<EX
+  UPDATE users 
+  SET lastLogin = :loggedDate 
+  WHERE idUsers = :idUsers;
+  EX;
+
+  $date = date('Y-m-d');
+
+  try {
+    DatabaseController::beginTransaction();
+
+    $req = DatabaseController::prepare($query);
+    $req->bindParam(':loggedDate', $date);
+    $req->bindParam(':idUsers', $idUser, PDO::PARAM_INT);
+    $req->execute();
+    DatabaseController::commit();
+    return true;
+  } catch (PDOException $e) {
+    DatabaseController::rollBack();
+    return false;
   }
 }
 

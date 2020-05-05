@@ -11,11 +11,7 @@ $password = filter_input(INPUT_POST, "password", FILTER_SANITIZE_STRING);
 $userLogged = null;
 
 if (strlen($authenticator) > 0 && strlen($password) > 0) {
-  if (strpos($authenticator, '@')) {
     $userLogged = Login(['userEmail' => $authenticator, 'userPwd' => $password]);
-  } else {
-    $userLogged = Login(['userNickname' => $authenticator, 'userPwd' => $password]);
-  }
 
   if ($userLogged !== false) {
     $_SESSION['loggedUser'] = $userLogged;
