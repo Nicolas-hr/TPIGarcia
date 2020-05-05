@@ -4,7 +4,7 @@
 /**
  * @author 	dominique.aigroz@edu.ge.ch
  */
-require_once '../config/config.php';
+require_once dirname(__DIR__) . '/config/config.php';
 
 /**
  * @brief	Helper class encapsulating
