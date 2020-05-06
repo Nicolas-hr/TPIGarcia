@@ -1,5 +1,6 @@
 <?php
 require_once './backend.php';
+require_once __DIR__ . './DatabaseController.php';
 
 if (session_status() == PHP_SESSION_NONE) {
   session_start();
