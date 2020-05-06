@@ -86,7 +86,7 @@ function Login(array $args)
   $pwd = hash('sha256', $userPwd . $salt);
 
   $query = <<<EX
-    SELECT idUsers, email, firstname, lastname, email
+    SELECT idUsers, email, firstname, lastname, email, phoneNumber, idRoles
      FROM users
      WHERE `{$loginField}` = :wayToConnectValue 
      AND password = :pwd;
