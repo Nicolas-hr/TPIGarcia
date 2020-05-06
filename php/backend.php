@@ -100,7 +100,7 @@ function Login(array $args)
 
     $result = $requestLogin->fetch(PDO::FETCH_ASSOC);
 
-    if ( $result !== false > 0) {
+    if ($result !== false > 0) {
       if (LoggedDate($result['idUsers'])) {
         return $result;
       } else {
@@ -109,7 +109,6 @@ function Login(array $args)
     } else {
       return false;
     }
-
   } catch (PDOException $e) {
     return null;
   }
@@ -125,7 +124,7 @@ function Login(array $args)
  * @return boolean
  * @version 1.0.0
  */
-function LoggedDate(int $idUser) : bool
+function LoggedDate(int $idUser): bool
 {
   $query = <<<EX
   UPDATE users 
