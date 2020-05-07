@@ -37,7 +37,7 @@ function Login(event) {
     success: (data) => {
       switch (data.ReturnCode) {
         case 0:
-          swal({
+          Swal.fire({
             title: "Authentification",
             text: data.Success,
             icon: "success",
@@ -54,7 +54,7 @@ function Login(event) {
           });
           break;
         case 1:
-          swal({
+          Swal.fire({
             title: "Login",
             text: data.Error,
             icon: "error",

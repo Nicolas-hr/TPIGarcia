@@ -64,7 +64,7 @@ function Register(event) {
       
       switch (data.ReturnCode) {
         case 0:
-          swal({
+          Swal.fire({
             title: "Inscription",
             text: data.Success,
             icon: "success",
@@ -84,7 +84,7 @@ function Register(event) {
           case 1:
           case 2:
           case 3:
-            swal({
+            Swal.fire({
               title: "Inscription",
               text: data.Error,
               icon: "error",

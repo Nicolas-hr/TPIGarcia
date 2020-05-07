@@ -17,41 +17,34 @@ SET email = :email, firstname = :firstname, lastname = :lastname, phoneNumber = 
 WHERE email = :oldEmail
 EX;
 
-if ($_SESSION['loggedUser']['idRoles'] == 2) {
-  if (strlen($email) > 0 && strlen($firstname) > 0 && strlen($lastname) > 0 && strlen($phoneNumber) > 0) {
-    try {
-      DatabaseController::beginTransaction();
+if (strlen($email) > 0 && strlen($firstname) > 0 && strlen($lastname) > 0 && strlen($phoneNumber) > 0) {
+  try {
+    DatabaseController::beginTransaction();
 
-      $modifyUserRequest = DatabaseController::prepare($query);
-      $modifyUserRequest->bindParam(':oldEmail', $oldEmail, PDO::PARAM_STR);
-      $modifyUserRequest->bindParam(':email', $email, PDO::PARAM_STR);
-      $modifyUserRequest->bindParam(':firstname', $firstname, PDO::PARAM_STR);
-      $modifyUserRequest->bindParam(':lastname', $lastname, PDO::PARAM_STR);
-      $modifyUserRequest->bindParam(':phoneNumber', $phoneNumber, PDO::PARAM_STR);
-      $modifyUserRequest->execute();
+    $modifyUserRequest = DatabaseController::prepare($query);
+    $modifyUserRequest->bindParam(':oldEmail', $oldEmail, PDO::PARAM_STR);
+    $modifyUserRequest->bindParam(':email', $email, PDO::PARAM_STR);
+    $modifyUserRequest->bindParam(':firstname', $firstname, PDO::PARAM_STR);
+    $modifyUserRequest->bindParam(':lastname', $lastname, PDO::PARAM_STR);
+    $modifyUserRequest->bindParam(':phoneNumber', $phoneNumber, PDO::PARAM_STR);
+    $modifyUserRequest->execute();
 
-      DatabaseController::commit();
+    DatabaseController::commit();
 
-      echo json_encode([
-        'ReturnCode' => 0,
-        'Success' => "L'utilisateur a bien été modifié"
-      ]);
-    } catch (PDOException $e) {
-      DatabaseController::rollBack();
-      echo json_encode([
-        'ReturnCode' => 1,
-        'Error' => $e->getMessage()
-      ]);
-    }
-  } else {
     echo json_encode([
-      'ReturnCode' => 2,
-      'Error' => "Vous devez remplir tous les champs"
+      'ReturnCode' => 0,
+      'Success' => "L'utilisateur a bien été modifié"
+    ]);
+  } catch (PDOException $e) {
+    DatabaseController::rollBack();
+    echo json_encode([
+      'ReturnCode' => 1,
+      'Error' => $e->getMessage()
     ]);
   }
 } else {
   echo json_encode([
-    'ReturnCode' => 3,
-    'Error' => "Vous n'avez pas les droits"
+    'ReturnCode' => 2,
+    'Error' => "Vous devez remplir tous les champs"
   ]);
 }

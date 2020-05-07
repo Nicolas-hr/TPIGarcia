@@ -73,7 +73,7 @@ function ShowContactsData(data) {
               </td>`;
     } else {
       if (userData.idUsers == contact.idUsers) {
-        html += `<td><button type="button" class="btn btn-secondary">Modifier</button></td>`;
+        html += `<td><button type="button" class="btn btn-secondary" onclick="ModifyUser(event)">Modifier</button></td>`;
       } else {
         html += `<td></td>`;
       }
