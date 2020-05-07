@@ -38,7 +38,7 @@ if (IsLogged() == true) {
     </div>
     <div class="form-group">
       <label for="mail">Numéro de téléphone</label>
-      <input type="text" class="form-control" id="phoneNumber">
+      <input type="tel" class="form-control" id="phoneNumber">
     </div>
     <div class="form-group">
       <label for="password">Mot de passe</label>

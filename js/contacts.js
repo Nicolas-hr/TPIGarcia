@@ -1,3 +1,14 @@
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timerProgressBar: true,
+  onOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer)
+    toast.addEventListener('mouseleave', Swal.resumeTimer)
+  }
+});
+
 $(document).ready(() => {
   GetContactsData();
 });
@@ -48,7 +59,7 @@ function ShowContactsData(data) {
 
   $.each(contactsData, (index, contact) => {
     html += `
-    <tr>
+    <tr id="userInfos">
       <th scope="col">${index + 1}</th>
       <td id="email">${contact.email}</td>
       <td id="firstname">${contact.firstname}</td>
@@ -57,7 +68,7 @@ function ShowContactsData(data) {
 
     if (userData.idRoles == 2) {
       html += `<td>
-                <button type="button" class="btn btn-secondary">Modifier</button>
+                <button type="button" class="btn btn-secondary" onclick="ModifyUser(event)">Modifier</button>
                 <button type="button" class="btn btn-danger" onclick="DeleteUser(event)">Supprimer</button>
               </td>`;
     } else {
@@ -80,14 +91,14 @@ function ShowContactsData(data) {
  * @author Hoarau Nicolas
  * @date 06.05.20
  * 
- * @brief Fonction qui supprime unn utilisateur via un call ajax
+ * @brief Fonction qui supprime un utilisateur via un call ajax
  * 
  * @param {*} event 
  * 
  * @version 1.0.0
  */
 function DeleteUser(event) {
-  let userEmail = event.target.parentNode.parentNode.children[1].textContent;
+  let userEmail = event.target.closest("#userInfos").children[1].textContent;
 
   swal({
     title: "Êtes vous sûr(e) ?",
@@ -96,32 +107,104 @@ function DeleteUser(event) {
     buttons: true,
     dangerMode: true,
   })
-  .then((willDelete) => {
-    if (willDelete) {
+    .then((willDelete) => {
+      if (willDelete) {
+        $.ajax({
+          type: "post",
+          url: "./php/deleteUser.php",
+          data: { userEmail: userEmail },
+          dataType: "json",
+          success: (response) => {
+            switch (response.ReturnCode) {
+              case 0:
+                swal({
+                  text: "L'utilisateur à bien été supprimé !",
+                  icon: "success",
+                  button: {
+                    visible: false,
+                    closeModal: true
+                  },
+                  timer: 1300,
+                  closeOnClickOutside: false,
+                  closeOnEsc: false,
+                  dangerMode: false,
+                });
+
+                GetContactsData();
+                break;
+            }
+          }
+        });
+      }
+    });
+}
+
+/**
+ * @author Hoarau Nicolas
+ * @date 06.05.20
+ * 
+ * @brief Fonction qui modifie un utilisateur via un call ajax
+ * 
+ * @param {*} event 
+ * 
+ * @version 1.0.0
+ */
+function ModifyUser(event) {
+  let email = event.target.closest("#userInfos").children[1].textContent;
+  let firstname = event.target.closest("#userInfos").children[2].textContent;
+  let lastname = event.target.closest("#userInfos").children[3].textContent;
+  let phoneNumber = event.target.closest("#userInfos").children[4].textContent;
+
+  Swal.fire({
+    title: 'Modifier',
+    icon: 'warning',
+    html:
+      `<input id="userEmail" class="swal2-input" type="email" value="${email}">
+      <input id="userFirstname" class="swal2-input" type="text" value="${firstname}">
+      <input id="userLastname" class="swal2-input" type="text" value="${lastname}">
+      <input id="userPhoneNumber" class="swal2-input" type="tel" value="${phoneNumber}">`,
+    showCloseButton: true,
+    showCancelButton: true,
+    onOpen: function () {
+      $('#userEmail').focus()
+    }
+  }).then((willModify) => {
+    if (willModify) {
       $.ajax({
         type: "post",
-        url: "./php/deleteUser.php",
-        data: {userEmail: userEmail},
+        url: "./php/modifyUser.php",
+        data: {
+          oldEmail: email,
+          userEmail: $('#userEmail').val(),
+          userFirstname: $('#userFirstname').val(),
+          userLastname: $('#userLastname').val(),
+          userPhoneNumber: $('#userPhoneNumber').val(),
+        },
         dataType: "json",
-        success: (data) => {
-          switch (data.ReturnCode) {
+        success: (response) => {
+          switch (response.ReturnCode) {
             case 0:
-              swal({
-                text: "L'utilisateur à bien été supprimé !",
+              Toast.fire({
                 icon: "success",
-                button: {
-                  visible: false,
-                  closeModal: true
-                },
-                timer: 1300,
-                closeOnClickOutside: false,
-                closeOnEsc: false,
-                dangerMode: false,
+                title: "L'utilisateur à bien été modifié !",
+                timer: 3000
               });
 
               GetContactsData();
               break;
+            case 1:
+            case 2:
+            case 3:
+              Toast.fire({
+                icon: "error",
+                title: response.Error,
+                timer: 3000
+              });
+              break;
           }
+        },
+        error: (error) => {
+          console.log(error);
         }
       });
     }

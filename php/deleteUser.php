@@ -1,5 +1,4 @@
 <?php
-require_once './backend.php';
 require_once __DIR__ . './DatabaseController.php';
 
 if (session_status() == PHP_SESSION_NONE) {
@@ -29,6 +28,7 @@ if ($_SESSION['loggedUser']['idRoles'] == 2) {
         'Success' => "L'utlisateur a bien été supprimé"
       ]);
     } catch (PDOException $e) {
+      DatabaseController::rollBack();
       echo json_encode([
         'ReturnCode' => 1,
         'Error' => $e->getMessage()
