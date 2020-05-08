@@ -100,43 +100,43 @@ function ShowContactsData(data) {
 function DeleteUser(event) {
   let userEmail = event.target.closest("#userInfos").children[1].textContent;
 
-  swal({
+  Swal.fire({
     title: "Êtes vous sûr(e) ?",
     text: `Supprimer ${userEmail} ?`,
     icon: "warning",
     buttons: true,
+    showCancelButton: true,
     dangerMode: true,
-  })
-    .then((willDelete) => {
-      if (willDelete) {
-        $.ajax({
-          type: "post",
-          url: "./php/deleteUser.php",
-          data: { userEmail: userEmail },
-          dataType: "json",
-          success: (response) => {
-            switch (response.ReturnCode) {
-              case 0:
-                swal({
-                  text: "L'utilisateur à bien été supprimé !",
-                  icon: "success",
-                  button: {
-                    visible: false,
-                    closeModal: true
-                  },
-                  timer: 1300,
-                  closeOnClickOutside: false,
-                  closeOnEsc: false,
-                  dangerMode: false,
-                });
+  }).then((willDelete) => {
+    if (willDelete.value) {
+      $.ajax({
+        type: "post",
+        url: "./php/deleteUser.php",
+        data: { userEmail: userEmail },
+        dataType: "json",
+        success: (response) => {
+          switch (response.ReturnCode) {
+            case 0:
+              Swal.fire({
+                text: "L'utilisateur à bien été supprimé !",
+                icon: "success",
+                button: {
+                  visible: false,
+                  closeModal: true
+                },
+                timer: 1300,
+                closeOnClickOutside: false,
+                closeOnEsc: false,
+                dangerMode: false,
+              });
 
-                GetContactsData();
-                break;
-            }
+              GetContactsData();
+              break;
           }
-        });
-      }
-    });
+        }
+      });
+    }
+  });
 }
 
 /**
